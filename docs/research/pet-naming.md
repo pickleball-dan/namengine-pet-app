@@ -19,9 +19,23 @@ Use these as engine signals, not user-facing copy.
 - Use physical notes, quirks, coloring, breed, and personality as taste inputs.
 - Cats can recognize their names but may only acknowledge them. Avoid framing cat recognition as obedience.
 
+## Species-weighted engine use
+
+- Dog: strongest acoustic/callability weighting, with command-sound avoidance treated as important.
+- Cat: recognition and distinctive phonetic shape matter; obedience-style response should be de-emphasized.
+- Horse: voice clarity matters in barn/outdoor settings, but the emotional tone should skew steady, strong, and dignified.
+- Bird: for parrots and social vocal birds, repeatable, bright, sing-song shapes matter more than formal meaning.
+- Rabbit: use soft positive-association naming; evidence for name cognition is weaker than for dogs/cats.
+- Reptile: lean more on visual/personality symbolism and owner meaning than call-response science.
+- Other: balance emotional projection with daily usability without overclaiming animal recognition.
+
 ## Sources checked
 
 - Saito et al., "Domestic cats (Felis catus) discriminate their names from other words," Scientific Reports, 2019.
 - Deaux et al., "Dog-human vocal interactions match dogs' sensory-motor tuning," PLOS Biology, 2024.
+- Proops et al., "Cross-modal individual recognition in domestic horses," PNAS, 2009.
+- Merkies et al., "Horses associate individual human voices with the valence of past interactions," Scientific Reports, 2019.
+- Berg et al., "Vertical transmission of learned signatures in a wild parrot," Proceedings of the Royal Society B, 2012.
+- Jorgewich-Cohen et al., "The Diversity and Evolution of Vocal Communication in Nonavian Reptiles," Annual Review of Ecology, Evolution, and Systematics, 2025.
 - "Pet Naming Practices in Turkey: Cats vs. Dogs," Names, 2025.
-- Practical trainer guidance commonly recommends short, crisp, easy-to-call dog names; treat this as applied guidance rather than a single definitive lab finding.
+- Practical trainer and husbandry guidance commonly recommends short, crisp, easy-to-call names for mammals trained through positive association; treat this as applied guidance rather than a single definitive lab finding.

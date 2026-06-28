@@ -317,6 +317,7 @@ PET_RESEARCH_GUIDANCE = """Research-informed pet naming guidance:
 - Recognition is learned through positive repetition. Favor names that owners will enjoy saying often, because consistency, praise, play, food, and attention build the response.
 - Human-style names can be a strong fit when the user wants family-member energy. Word, food, nature, mythology, and pop-culture names should still feel usable and personal.
 - Physical notes, quirks, coloring, breed, and personality should influence imagery and tone when supplied.
+- Species weighting matters: dogs need the strongest call-name clarity; cats need distinctive recognition without obedience assumptions; horses need barn/outdoor clarity and steady dignity; birds need bright repeatable vocal shape; rabbits need soft positive-association names; reptiles lean more on visual/personality symbolism than response-to-name science.
 - Treat these as ranking signals, not rigid rules. A beautiful exception can still win if it fits the user's taste.
 """
 
@@ -529,6 +530,7 @@ def build_details(form_data, refinement_note=''):
     return "\n".join([
         "RESEARCH-INFORMED NAMING SIGNALS:",
         PET_RESEARCH_GUIDANCE,
+        species_research_guidance(form_data),
         "",
         "HARD CONSTRAINTS:",
         *(f"- {item}" for item in (hard_constraints or ["No hard constraints supplied."])),
@@ -552,11 +554,74 @@ def build_details(form_data, refinement_note=''):
 
 def pet_type_category(form_data):
     pet_type = (form_data.get('pet_type') or '').lower()
-    if any(token in pet_type for token in ['dog', 'puppy', 'horse', 'bird']):
-        return 'call_responsive'
+    if any(token in pet_type for token in ['dog', 'puppy']):
+        return 'dog'
     if any(token in pet_type for token in ['cat', 'kitten']):
-        return 'recognition_oriented'
+        return 'cat'
+    if 'horse' in pet_type:
+        return 'horse'
+    if 'bird' in pet_type:
+        return 'bird'
+    if 'rabbit' in pet_type or 'bunny' in pet_type:
+        return 'rabbit'
+    if 'reptile' in pet_type or any(token in pet_type for token in ['lizard', 'snake', 'turtle', 'tortoise', 'gecko']):
+        return 'reptile'
     return 'general_pet'
+
+
+SPECIES_PROFILES = {
+    'dog': {
+        'label': 'Dog',
+        'callability_weight': 1.0,
+        'command_weight': 1.0,
+        'guidance': 'Prioritize everyday call clarity: short rhythm, crisp consonants, open endings, and no command confusion.',
+    },
+    'cat': {
+        'label': 'Cat',
+        'callability_weight': 0.6,
+        'command_weight': 0.45,
+        'guidance': 'Prioritize distinctive recognition and owner-emotional fit. Avoid implying the cat will reliably come when called.',
+    },
+    'horse': {
+        'label': 'Horse',
+        'callability_weight': 0.85,
+        'command_weight': 0.75,
+        'guidance': 'Prioritize names that carry clearly in a barn or outdoor setting and feel steady, dignified, and easy to repeat.',
+    },
+    'bird': {
+        'label': 'Bird',
+        'callability_weight': 0.75,
+        'command_weight': 0.45,
+        'guidance': 'Prioritize bright, repeatable, social vocal shape, especially for parrot-like birds.',
+    },
+    'rabbit': {
+        'label': 'Rabbit',
+        'callability_weight': 0.45,
+        'command_weight': 0.35,
+        'guidance': 'Prioritize gentle sound, soft association, and owner bond rather than strong obedience-style call response.',
+    },
+    'reptile': {
+        'label': 'Reptile',
+        'callability_weight': 0.2,
+        'command_weight': 0.15,
+        'guidance': 'Prioritize visual/personality symbolism, species feel, and owner meaning more than response-to-name science.',
+    },
+    'general_pet': {
+        'label': 'Pet',
+        'callability_weight': 0.65,
+        'command_weight': 0.6,
+        'guidance': 'Balance emotional fit with practical daily use and household clarity.',
+    },
+}
+
+
+def species_profile(form_data):
+    return SPECIES_PROFILES.get(pet_type_category(form_data), SPECIES_PROFILES['general_pet'])
+
+
+def species_research_guidance(form_data):
+    profile = species_profile(form_data)
+    return f"{profile['label']} weighting: {profile['guidance']}"
 
 
 COMMAND_SOUND_ALIKES = {
@@ -595,11 +660,7 @@ def command_confusion_penalty(name, form_data):
     if cleaned.startswith(('no', 'sit', 'stay')) and len(cleaned) <= 6:
         penalty -= 8
 
-    if pet_type_category(form_data) == 'call_responsive':
-        return penalty
-    if pet_type_category(form_data) == 'recognition_oriented':
-        return round(penalty * 0.5)
-    return round(penalty * 0.75)
+    return round(penalty * species_profile(form_data)['command_weight'])
 
 
 def callability_score(name, form_data):
@@ -621,11 +682,43 @@ def callability_score(name, form_data):
     if re.search(r'(.)\1{2,}', cleaned) or re.search(r'[^aeiouy]{4,}', cleaned):
         score -= 8
     score += command_confusion_penalty(cleaned, form_data)
-    if pet_type_category(form_data) == 'call_responsive':
-        return score
-    if pet_type_category(form_data) == 'recognition_oriented':
-        return round(score * 0.6)
-    return round(score * 0.8)
+    return round(score * species_profile(form_data)['callability_weight'])
+
+
+def species_style_score(name, form_data):
+    cleaned = re.sub(r'[^a-z]', '', (name or '').lower())
+    category = pet_type_category(form_data)
+    if not cleaned:
+        return 0
+    score = 0
+    if category == 'cat':
+        if len(cleaned) <= 6:
+            score += 4
+        if cleaned.endswith(('a', 'i', 'o', 'ie')):
+            score += 3
+    elif category == 'horse':
+        if re.search(r'[bdgkrt]', cleaned):
+            score += 4
+        if len(cleaned) >= 4:
+            score += 2
+    elif category == 'bird':
+        if re.search(r'(.)\1', cleaned):
+            score += 4
+        if cleaned.endswith(('i', 'ie', 'y', 'o', 'a')):
+            score += 4
+        if len(cleaned) <= 6:
+            score += 2
+    elif category == 'rabbit':
+        if cleaned.endswith(('a', 'ie', 'y', 'i')):
+            score += 3
+        if re.search(r'[bpml]', cleaned):
+            score += 2
+    elif category == 'reptile':
+        if re.search(r'[zksrv]', cleaned):
+            score += 4
+        if len(cleaned) >= 4:
+            score += 2
+    return score
 
 
 def summarize_preferences(form_data):
@@ -1210,6 +1303,7 @@ def generate_fallback_results(exclude_names=None, form_data=None):
         candidates,
         key=lambda item: (
             callability_score(item.get('name'), form_data),
+            species_style_score(item.get('name'), form_data),
             random.random(),
         ),
         reverse=True,
@@ -1483,6 +1577,10 @@ def build_original_details(form_data, tune_direction='', previous_names=None, re
             f"Length preference: {form_data.get('length_preference') or 'Balanced'}",
             f"Avoid feeling like: {form_data.get('avoid_feel') or 'No explicit avoidances'}",
         ]),
+        ('SPECIES-WEIGHTED NAMING SIGNALS', [
+            species_research_guidance(form_data),
+            'Use pet-naming research quietly as ranking guidance, not as user-facing explanation.',
+        ]),
         ('EXTRA CONTEXT', [
             form_data.get('notes') or 'No extra notes supplied.',
         ]),
@@ -1568,6 +1666,20 @@ def build_original_name_parts(profile):
         ends = unique_ordered(['o', 'ie', 'er', 'en', 'y', *ends])
     elif any(token in pet_type for token in ['cat', 'kitten']):
         ends = unique_ordered(['a', 'i', 'o', 'ie', 'u', *ends])
+    elif 'horse' in pet_type:
+        starts = unique_ordered(['Beau', 'Duke', 'Cal', 'Ro', 'Tor', 'Vale', *starts])
+        ends = unique_ordered(['o', 'er', 'en', 'or', 'a', *ends])
+    elif 'bird' in pet_type:
+        starts = unique_ordered(['Pip', 'Ki', 'Tiki', 'Bibi', 'Zazu', 'Lolo', *starts])
+        middles = unique_ordered(['pi', 'ki', 'li', 'lo', 'ri', *middles])
+        ends = unique_ordered(['i', 'ie', 'o', 'a', 'y', *ends])
+    elif 'rabbit' in pet_type or 'bunny' in pet_type:
+        starts = unique_ordered(['Mimi', 'Bun', 'Lulu', 'Nori', 'Pip', 'Coco', *starts])
+        ends = unique_ordered(['a', 'ie', 'y', 'i', *ends])
+    elif 'reptile' in pet_type or any(token in pet_type for token in ['lizard', 'snake', 'turtle', 'tortoise', 'gecko']):
+        starts = unique_ordered(['Zora', 'Ivo', 'Rune', 'Sable', 'Koa', 'Nero', *starts])
+        middles = unique_ordered(['ra', 'ko', 'ven', 'sol', 'zar', *middles])
+        ends = unique_ordered(['o', 'a', 'is', 'en', 'or', *ends])
 
     if requested_start:
         starts = [requested_start.capitalize(), requested_start[:1].upper() + 'a', requested_start[:1].upper() + 'e'] + starts
@@ -1734,6 +1846,7 @@ def score_original_candidate(name, form_data, known_names):
     if syllable_count(lowered) > 4:
         score -= 20
     score += callability_score(lowered, form_data)
+    score += species_style_score(lowered, form_data)
     if any(slug_similarity(lowered, known) > 0.78 for known in known_names):
         score -= 8
     avoid = (form_data.get('avoid_feel') or '').lower()
