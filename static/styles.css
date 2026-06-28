@@ -7,7 +7,6 @@
   --line: rgba(31, 36, 48, 0.1);
   --accent: #2ea7b0;
   --accent-deep: #1a223f;
-  --pet-accent: #d86f63;
   --accent-soft: rgba(46, 167, 176, 0.12);
   --glow: rgba(46, 167, 176, 0.16);
   --shadow: 0 24px 80px rgba(27, 35, 54, 0.08);
@@ -93,47 +92,16 @@ a { color: inherit; }
   padding: 32px;
 }
 
-.logo-lockup,
-.brand-lockup {
+.logo-lockup {
   width: min(260px, 62vw);
   height: auto;
   display: block;
   margin-bottom: 18px;
 }
 
-.brand-lockup {
-  width: max-content;
-  max-width: 100%;
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.6rem, 4vw, 2.25rem);
-  font-weight: 700;
-  line-height: 1;
-  color: var(--ink);
-  display: inline-flex;
-  align-items: center;
-  gap: 0.42em;
-}
-
-.brand-lockup::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 1.18em;
-  height: 1.18em;
-  background: url("images/namengine-pet-mark.svg") center / contain no-repeat;
-}
-
-.brand-product {
-  color: var(--pet-accent);
-}
-
 .small-logo {
   width: min(220px, 48vw);
   margin-bottom: 14px;
-}
-
-.brand-lockup.small-logo {
-  width: max-content;
-  font-size: clamp(1.25rem, 3vw, 1.65rem);
 }
 
 .eyebrow,

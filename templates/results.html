@@ -13,7 +13,7 @@
   <main class="shell results-shell">
     <section class="results-header results-header-grid">
       <div>
-        <span class="brand-lockup small-logo">NamEngine <span class="brand-product">Pet</span></span>
+        <img class="logo-lockup small-logo" src="{{ url_for('static', filename='images/namengine-pet-logo.jpg') }}" alt="NamEngine Pet logo">
         <p class="eyebrow">{{ round_label }}</p>
         <h1>{% if round_number == 1 %}Take a look at these pet names.{% elif round_number == 2 %}Do these names feel closer to what you want?{% else %}Can you hear yourself calling one of these?{% endif %}</h1>
       </div>
