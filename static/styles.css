@@ -108,6 +108,17 @@ a { color: inherit; }
   font-weight: 700;
   line-height: 1;
   color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42em;
+}
+
+.brand-lockup::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 1.18em;
+  height: 1.18em;
+  background: url("images/namengine-pet-mark.svg") center / contain no-repeat;
 }
 
 .small-logo {
