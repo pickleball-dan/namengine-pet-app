@@ -100,7 +100,7 @@
                 <span>Discovery style</span>
                 <div class="select-wrap tinted-select tinted-amber">
                   <select name="discovery_style" data-brief-label="Discovery">
-                    <option value="" {% if not form_data.discovery_style %}selected{% endif %}>No preference</option>
+                    <option value="" {% if not form_data.discovery_style %}selected{% endif %}>Choose</option>
                     {% for option in discovery_style_options %}
                     <option {% if form_data.discovery_style == option %}selected{% endif %}>{{ option }}</option>
                     {% endfor %}
@@ -109,16 +109,17 @@
               </label>
 
               <label>
-                <span>Who are you naming?</span>
+                <span>Who's joining the family?</span>
                 <div class="select-wrap tinted-select tinted-aqua">
                   <select name="pet_type" data-brief-label="For">
                     <option value="" {% if not form_data.pet_type %}selected{% endif %}>Choose</option>
                     <option {% if form_data.pet_type == 'Dog' %}selected{% endif %}>Dog</option>
                     <option {% if form_data.pet_type == 'Cat' %}selected{% endif %}>Cat</option>
-                    <option {% if form_data.pet_type == 'Puppy' %}selected{% endif %}>Puppy</option>
-                    <option {% if form_data.pet_type == 'Kitten' %}selected{% endif %}>Kitten</option>
-                    <option {% if form_data.pet_type == 'Small pet' %}selected{% endif %}>Small pet</option>
-                    <option {% if form_data.pet_type == 'Not sure yet' %}selected{% endif %}>Not sure yet</option>
+                    <option {% if form_data.pet_type == 'Horse' %}selected{% endif %}>Horse</option>
+                    <option {% if form_data.pet_type == 'Bird' %}selected{% endif %}>Bird</option>
+                    <option {% if form_data.pet_type == 'Rabbit' %}selected{% endif %}>Rabbit</option>
+                    <option {% if form_data.pet_type == 'Reptile' %}selected{% endif %}>Reptile</option>
+                    <option {% if form_data.pet_type == 'Other' %}selected{% endif %}>Other</option>
                   </select>
                 </div>
               </label>
@@ -169,9 +170,9 @@
               </label>
 
               <label>
-                <span>How important is easy pronunciation?</span>
+                <span>How easy should it be to call?</span>
                 <div class="select-wrap tinted-select tinted-mint">
-                  <select name="pronunciation_importance" data-brief-label="Pronunciation">
+                  <select name="pronunciation_importance" data-brief-label="Easy to call">
                     <option value="" {% if not form_data.pronunciation_importance %}selected{% endif %}>Choose</option>
                     <option {% if form_data.pronunciation_importance == 'Very important' %}selected{% endif %}>Very important</option>
                     <option {% if form_data.pronunciation_importance == 'Helpful but not absolute' %}selected{% endif %}>Helpful but not absolute</option>
@@ -183,26 +184,30 @@
 
             <div class="grid two-up">
               <label>
-                <span>Desired vibe</span>
+                <span>What personality should the name capture?</span>
                 <div class="select-wrap tinted-select tinted-sky">
-                  <select name="vibe" data-brief-label="Vibe">
+                  <select name="vibe" data-brief-label="Personality">
                     <option value="" {% if not form_data.vibe %}selected{% endif %}>Choose</option>
-                    <option {% if form_data.vibe == 'Warm and grounded' %}selected{% endif %}>Warm and grounded</option>
-                    <option {% if form_data.vibe == 'Soft and gentle' %}selected{% endif %}>Soft and gentle</option>
-                    <option {% if form_data.vibe == 'Elegant and understated' %}selected{% endif %}>Elegant and understated</option>
-                    <option {% if form_data.vibe == 'Bright and lively' %}selected{% endif %}>Bright and lively</option>
-                    <option {% if form_data.vibe == 'Strong and composed' %}selected{% endif %}>Strong and composed</option>
-                    <option {% if form_data.vibe == 'Romantic and lyrical' %}selected{% endif %}>Romantic and lyrical</option>
-                    <option {% if form_data.vibe == 'Modern and crisp' %}selected{% endif %}>Modern and crisp</option>
-                    <option {% if form_data.vibe == 'Distinctive but easy' %}selected{% endif %}>Distinctive but easy</option>
+                    <option {% if form_data.vibe == 'Playful' %}selected{% endif %}>Playful</option>
+                    <option {% if form_data.vibe == 'Loyal' %}selected{% endif %}>Loyal</option>
+                    <option {% if form_data.vibe == 'Elegant' %}selected{% endif %}>Elegant</option>
+                    <option {% if form_data.vibe == 'Brave' %}selected{% endif %}>Brave</option>
+                    <option {% if form_data.vibe == 'Curious' %}selected{% endif %}>Curious</option>
+                    <option {% if form_data.vibe == 'Gentle' %}selected{% endif %}>Gentle</option>
+                    <option {% if form_data.vibe == 'Mischievous' %}selected{% endif %}>Mischievous</option>
+                    <option {% if form_data.vibe == 'Regal' %}selected{% endif %}>Regal</option>
+                    <option {% if form_data.vibe == 'Adventurous' %}selected{% endif %}>Adventurous</option>
+                    <option {% if form_data.vibe == 'Quirky' %}selected{% endif %}>Quirky</option>
+                    <option {% if form_data.vibe == 'Sweet' %}selected{% endif %}>Sweet</option>
+                    <option {% if form_data.vibe == 'Tough' %}selected{% endif %}>Tough</option>
                   </select>
                 </div>
               </label>
 
               <label>
-                <span>Cultural feel</span>
+                <span>Name inspiration</span>
                 <div class="select-wrap tinted-select tinted-mint">
-                  <select name="cultural_context" data-brief-label="Cultural feel">
+                  <select name="cultural_context" data-brief-label="Inspiration">
                     <option value="" {% if not form_data.cultural_context %}selected{% endif %}>No preference</option>
                     {% for option in cultural_feel_options %}
                     <option {% if form_data.cultural_context == option %}selected{% endif %}>{{ option }}</option>
@@ -218,8 +223,8 @@
             </label>
 
             <label>
-              <span>Anything else that matters?</span>
-              <textarea name="notes" rows="3" placeholder="Breed, color, quirks, names to avoid, words you want it to sound like..." data-brief-label="Must-haves" data-brief-short="true">{{ form_data.notes }}</textarea>
+              <span>Tell us about your pet</span>
+              <textarea name="notes" rows="3" placeholder="Breed, coloring, personality, funny quirks, names to avoid, favorite themes..." data-brief-label="Pet notes" data-brief-short="true">{{ form_data.notes }}</textarea>
             </label>
 
             <div class="loading-wrap">
@@ -229,9 +234,9 @@
           </div>
 
           {% if live_brief_enabled %}
-          <details id="live-brief-panel" class="live-brief-panel js-live-brief-panel" aria-live="polite" aria-label="Your taste so far">
+          <details id="live-brief-panel" class="live-brief-panel js-live-brief-panel" aria-live="polite" aria-label="Your style profile">
             <summary class="live-brief-top">
-              <p class="panel-label">Your taste so far</p>
+              <p class="panel-label">Your style profile</p>
               <span class="brief-strength-pill js-brief-strength">Light taste</span>
               <div class="brief-strength-track" aria-hidden="true">
                 <span class="js-brief-strength-fill"></span>

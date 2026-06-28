@@ -104,34 +104,23 @@ ORIGINAL_TUNE_OPTIONS = [
 ORIGINAL_TUNE_LABELS = {item['value']: item['label'] for item in ORIGINAL_TUNE_OPTIONS}
 
 DISCOVERY_STYLE_OPTIONS = [
-    'Safe favorites',
-    'Familiar but fresh',
-    'Hidden gems',
-    'Bold discoveries',
-    'Surprise me',
+    'Classic favorites',
+    'Balanced mix',
+    'Unexpected finds',
+    'Completely original',
 ]
 
 CULTURAL_FEEL_OPTIONS = [
-    'African',
-    'American',
-    'Arabic',
-    'British',
-    'Chinese',
-    'French',
-    'German',
-    'Greek',
-    'Hebrew',
-    'Indian',
-    'International / blended',
-    'Irish',
-    'Italian',
-    'Japanese',
-    'Korean',
-    'Latin American',
-    'Nordic',
-    'Persian',
-    'Scottish',
-    'Spanish',
+    'Nature',
+    'Mythology',
+    'Human names',
+    'Food & drink',
+    'Literature',
+    'Movies & TV',
+    'Music',
+    'Geography',
+    'Vintage',
+    'Pop culture',
 ]
 
 CULTURAL_SOUND_PARTS = {
@@ -384,13 +373,13 @@ Core standards:
 - Create names, do not simply return common pet names.
 - Avoid established names that already feel familiar as given names; every result should feel newly coined or meaningfully transformed.
 - Do not use names like Liora, Elara, Vela, Lenora, Mariel, Lucien, Marcel, Etienne, Bastien, Mizuki, or other recognizable existing names.
-- Discovery style controls how conservative or adventurous the coined names should feel; even Safe favorites must be newly coined names, not established names.
+- Discovery style controls how conservative or adventurous the coined names should feel; even Classic favorites must be newly coined names, not established names.
 - Names should still feel usable for a real pet in daily life.
 - Use plain ASCII spellings only; do not use accent marks or special characters.
 - Avoid fantasy, product-code, app-name, and random-syllable energy unless the user explicitly asks for boldness.
 - Add an emotional_opener that explains the first impression in a short, human phrase.
 - Favor clean spoken shape, good mouthfeel, and social usability.
-- Use cultural feel as inspiration for rhythm and sound, not as a claim of linguistic authenticity.
+- Use name inspiration as a creative cue for rhythm, imagery, and sound, not as a claim of linguistic authenticity.
 - If a starting letter is supplied, honor it unless it would badly damage the name.
 - Respect previous names and do not repeat or make near duplicates.
 - The originality note should be honest: say low-match / inspired shape / not guaranteed globally unique.
@@ -430,13 +419,13 @@ QUESTION_LABELS = {
     'discovery_style': 'Discovery style',
     'pet_type': 'Pet type',
     'style': 'Style leaning',
-    'vibe': 'Desired vibe',
-    'cultural_context': 'Cultural feel',
+    'vibe': 'Personality',
+    'cultural_context': 'Name inspiration',
     'timeless_vs_distinctive': 'Timeless vs distinctive',
     'familiarity_preference': 'Familiarity preference',
-    'pronunciation_importance': 'Pronunciation ease',
+    'pronunciation_importance': 'Easy to call',
     'partner_alignment': 'Taste differences',
-    'notes': 'Extra notes',
+    'notes': 'Pet notes',
 }
 
 
@@ -491,21 +480,21 @@ def build_details(form_data, refinement_note=''):
     if form_data.get('pet_type'):
         hard_constraints.append(f"Pet type: {form_data['pet_type']}")
     if form_data.get('pronunciation_importance'):
-        hard_constraints.append(f"Pronunciation requirement: {form_data['pronunciation_importance']}")
+        hard_constraints.append(f"Easy-to-call requirement: {form_data['pronunciation_importance']}")
 
     if form_data.get('style'):
         soft_preferences.append(f"Style leaning: {form_data['style']}")
     if form_data.get('discovery_style'):
         soft_preferences.append(f"Discovery style / search range: {form_data['discovery_style']}")
     if form_data.get('cultural_context'):
-        soft_preferences.append(f"Cultural feel to lean toward: {form_data['cultural_context']}")
+        soft_preferences.append(f"Name inspiration to lean toward: {form_data['cultural_context']}")
     if form_data.get('timeless_vs_distinctive'):
         soft_preferences.append(f"Distinctiveness balance: {form_data['timeless_vs_distinctive']}")
     if form_data.get('familiarity_preference'):
         soft_preferences.append(f"Familiarity preference: {form_data['familiarity_preference']}")
 
     if form_data.get('vibe'):
-        emotional_goals.append(f"Desired emotional tone: {form_data['vibe']}")
+        emotional_goals.append(f"Pet personality to capture: {form_data['vibe']}")
     if form_data.get('notes'):
         emotional_goals.append(f"Additional emotional/fit notes: {form_data['notes']}")
 
@@ -586,6 +575,18 @@ def build_editor_note(form_data, used_fallback, round_number):
         'romantic and lyrical': 'romantic and lyrical',
         'modern and crisp': 'modern and crisp',
         'distinctive but easy': 'distinctive but easy',
+        'playful': 'playful',
+        'loyal': 'loyal',
+        'elegant': 'elegant',
+        'brave': 'brave',
+        'curious': 'curious',
+        'gentle': 'gentle',
+        'mischievous': 'mischievous',
+        'regal': 'regal',
+        'adventurous': 'adventurous',
+        'quirky': 'quirky',
+        'sweet': 'sweet',
+        'tough': 'tough',
         'open-ended': 'thoughtful and flexible',
     }, 'thoughtful and flexible')
 
@@ -606,6 +607,10 @@ def build_editor_note(form_data, used_fallback, round_number):
     }, 'without boxing you into one familiarity lane')
 
     discovery_phrase = pick_phrase(dimensions['discovery_style'], {
+        'classic favorites': 'with a classic-favorites search range',
+        'balanced mix': 'with a balanced mix of familiar and fresh ideas',
+        'unexpected finds': 'with a more exploratory discovery range',
+        'completely original': 'with a highly original discovery range',
         'safe favorites': 'with a safer, broadly agreeable search range',
         'familiar but fresh': 'with familiar-but-fresh discovery range',
         'hidden gems': 'with an underused, hidden-gem bias',
@@ -1341,6 +1346,10 @@ def build_original_editor_note(form_data, tune_direction=''):
 def format_original_discovery_style(discovery_style):
     style = (discovery_style or '').strip()
     descriptions = {
+        'Classic favorites': 'Classic favorites: conservative, broadly wearable coined names; avoid established real names.',
+        'Balanced mix': 'Balanced mix: approachable coined names with some freshness and some familiarity.',
+        'Unexpected finds': 'Unexpected finds: more exploratory coined names that still feel callable.',
+        'Completely original': 'Completely original: the boldest coined-name lane, while staying usable for a real pet.',
         'Safe favorites': 'Safe favorites: conservative, broadly wearable coined names; avoid established real names.',
         'Familiar but fresh': 'Familiar but fresh: approachable coined names with a recognizable rhythm and a fresh shape.',
         'Hidden gems': 'Hidden gems: underused-feeling coined names that still sound livable.',
@@ -1361,12 +1370,12 @@ def build_original_details(form_data, tune_direction='', previous_names=None, re
         ]),
         ('TASTE SIGNALS', [
             f"Core style: {form_data.get('style') or 'Balanced'}",
-            f"Emotional vibe: {form_data.get('vibe') or 'Open-ended'}",
-            f"Cultural feel: {form_data.get('cultural_context') or 'No preference'}",
+            f"Pet personality: {form_data.get('vibe') or 'Open-ended'}",
+            f"Name inspiration: {form_data.get('cultural_context') or 'No preference'}",
             f"Familiarity preference: {form_data.get('familiarity_preference') or 'Open'}",
         ]),
         ('USABILITY SIGNALS', [
-            f"Pronunciation ease: {form_data.get('pronunciation_importance') or 'Moderate'}",
+            f"Easy to call: {form_data.get('pronunciation_importance') or 'Moderate'}",
             f"Starting letter: {form_data.get('starting_letter') or 'Open'}",
             f"Length preference: {form_data.get('length_preference') or 'Balanced'}",
             f"Avoid feeling like: {form_data.get('avoid_feel') or 'No explicit avoidances'}",
@@ -1644,7 +1653,7 @@ def format_cultural_feel_phrase(cultural_feel):
     if not cleaned:
         return ''
     article = 'an' if cleaned[0] in 'aeiou' else 'a'
-    return f"{article} {cleaned} cultural feel"
+    return f"{article} {cleaned} inspiration"
 
 
 def build_original_fit_note(name, form_data, tune_direction=''):
