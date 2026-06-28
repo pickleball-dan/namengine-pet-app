@@ -309,6 +309,15 @@ FALLBACK_NAMES = [
     },
 ]
 
+PET_RESEARCH_GUIDANCE = """Research-informed pet naming guidance:
+- For dogs and call-responsive pets, favor names that work as an attention cue: usually 1-2 syllables, clean stress, crisp consonants such as k, t, p, d, ch, or b, and vowel endings that are easy to call.
+- For cats, assume recognition matters more than obedience. Prefer distinctive phonetic shape, avoid names that blur into household words or other pet names, and do not overpromise that the cat will come when called.
+- For all pets, weigh daily callability, nickname potential, household clarity, and emotional fit. A name should feel good when called often, not just look cute on a list.
+- Human-style names can be a strong fit when the user wants family-member energy. Word, food, nature, mythology, and pop-culture names should still feel usable and personal.
+- Physical notes, quirks, coloring, breed, and personality should influence imagery and tone when supplied.
+- Treat these as ranking signals, not rigid rules. A beautiful exception can still win if it fits the user's taste.
+"""
+
 PROMPT_TEMPLATE = """You are NamEngine Pet's hidden naming strategist.
 Your job is to turn fuzzy human taste into a sharp, premium list.
 Return exactly 8 pet names as valid HTML-free JSON with this schema:
@@ -337,6 +346,7 @@ Core standards:
 - Favor names with staying power over names that merely sound current.
 - Pay attention to callability, pronunciation friction, trend fatigue, pet personality, household fit, and emotional tone.
 - If the taste notes suggest household compromise or mixed tastes, reflect that in the list balance.
+- Use the research guidance below quietly when ranking names. Do not mention research unless it directly helps explain fit.
 
 Decision policy:
 - Treat HARD CONSTRAINTS as non-negotiable.
@@ -383,6 +393,7 @@ Core standards:
 - If a starting letter is supplied, honor it unless it would badly damage the name.
 - Respect previous names and do not repeat or make near duplicates.
 - The originality note should be honest: say low-match / inspired shape / not guaranteed globally unique.
+- Use the research guidance below quietly when ranking names. Do not mention research unless it directly helps explain fit.
 
 Here is the structured original-name taste:
 {details}
@@ -514,6 +525,9 @@ def build_details(form_data, refinement_note=''):
     ]
 
     return "\n".join([
+        "RESEARCH-INFORMED NAMING SIGNALS:",
+        PET_RESEARCH_GUIDANCE,
+        "",
         "HARD CONSTRAINTS:",
         *(f"- {item}" for item in (hard_constraints or ["No hard constraints supplied."])),
         "",
@@ -532,6 +546,40 @@ def build_details(form_data, refinement_note=''):
         "HIDDEN INTERPRETATION:",
         *(f"- {item}" for item in hidden_interpretation),
     ])
+
+
+def pet_type_category(form_data):
+    pet_type = (form_data.get('pet_type') or '').lower()
+    if any(token in pet_type for token in ['dog', 'puppy', 'horse', 'bird']):
+        return 'call_responsive'
+    if any(token in pet_type for token in ['cat', 'kitten']):
+        return 'recognition_oriented'
+    return 'general_pet'
+
+
+def callability_score(name, form_data):
+    cleaned = re.sub(r'[^a-z]', '', (name or '').lower())
+    if not cleaned:
+        return 0
+    syllables = syllable_count(cleaned)
+    score = 0
+    if syllables == 2:
+        score += 10
+    elif syllables == 1:
+        score += 5
+    elif syllables > 3:
+        score -= 8
+    if re.search(r'[ktpdb]|ch', cleaned):
+        score += 5
+    if cleaned.endswith(('a', 'o', 'ie', 'y', 'i')):
+        score += 4
+    if re.search(r'(.)\1{2,}', cleaned) or re.search(r'[^aeiouy]{4,}', cleaned):
+        score -= 8
+    if pet_type_category(form_data) == 'call_responsive':
+        return score
+    if pet_type_category(form_data) == 'recognition_oriented':
+        return round(score * 0.6)
+    return round(score * 0.8)
 
 
 def summarize_preferences(form_data):
@@ -1106,18 +1154,27 @@ def store_feedback(source):
     return entry
 
 
-def generate_fallback_results(exclude_names=None):
+def generate_fallback_results(exclude_names=None, form_data=None):
     exclude = {name.lower() for name in (exclude_names or [])}
     candidates = [item for item in FALLBACK_NAMES if item['name'].lower() not in exclude]
     if len(candidates) < 8:
         candidates = FALLBACK_NAMES[:]
-    return random.sample(candidates, k=min(8, len(candidates)))
+    form_data = form_data or {}
+    candidates = sorted(
+        candidates,
+        key=lambda item: (
+            callability_score(item.get('name'), form_data),
+            random.random(),
+        ),
+        reverse=True,
+    )
+    return candidates[:min(8, len(candidates))]
 
 
 def generate_names(form_data, refinement_note='', exclude_names=None):
     api_key = os.getenv('OPENAI_API_KEY')
     if not api_key or OpenAI is None:
-        return generate_fallback_results(exclude_names=exclude_names), True
+        return generate_fallback_results(exclude_names=exclude_names, form_data=form_data), True
 
     try:
         client = OpenAI(api_key=api_key)
@@ -1163,7 +1220,7 @@ def generate_names(form_data, refinement_note='', exclude_names=None):
     except Exception as exc:
         app.logger.exception('OpenAI generation failed: %s', exc)
 
-    return generate_fallback_results(exclude_names=exclude_names), True
+    return generate_fallback_results(exclude_names=exclude_names, form_data=form_data), True
 
 
 def store_shortlist(shortlist):
@@ -1630,6 +1687,7 @@ def score_original_candidate(name, form_data, known_names):
         score -= 12
     if syllable_count(lowered) > 4:
         score -= 20
+    score += callability_score(lowered, form_data)
     if any(slug_similarity(lowered, known) > 0.78 for known in known_names):
         score -= 8
     avoid = (form_data.get('avoid_feel') or '').lower()
