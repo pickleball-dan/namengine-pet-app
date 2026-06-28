@@ -7,6 +7,7 @@
   --line: rgba(31, 36, 48, 0.1);
   --accent: #2ea7b0;
   --accent-deep: #1a223f;
+  --pet-accent: #d86f63;
   --accent-soft: rgba(46, 167, 176, 0.12);
   --glow: rgba(46, 167, 176, 0.16);
   --shadow: 0 24px 80px rgba(27, 35, 54, 0.08);
@@ -119,6 +120,10 @@ a { color: inherit; }
   width: 1.18em;
   height: 1.18em;
   background: url("images/namengine-pet-mark.svg") center / contain no-repeat;
+}
+
+.brand-product {
+  color: var(--pet-accent);
 }
 
 .small-logo {
