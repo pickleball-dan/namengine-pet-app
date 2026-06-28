@@ -11,8 +11,13 @@ Use these as engine signals, not user-facing copy.
 ## Practical signals
 
 - For dogs and call-responsive pets, prefer names with 1-2 syllables, crisp consonants, and easy vowel endings when the user's taste allows it.
+- Distinct consonants such as B, D, K, P, T, S, and CH help a name cut through ordinary household noise.
+- Open vowel endings such as A, O, and EE are common trainer recommendations because they carry well when called.
+- Avoid names that blur into common commands, especially sit, stay, no, come, down, heel, wait, leave it, drop it, or off.
 - For all pets, weigh daily use: callability, nickname potential, household clarity, and whether the name still feels good after repeated use.
+- Recognition is learned through consistent positive association: praise, food, play, and attention.
 - Use physical notes, quirks, coloring, breed, and personality as taste inputs.
+- Cats can recognize their names but may only acknowledge them. Avoid framing cat recognition as obedience.
 
 ## Sources checked
 

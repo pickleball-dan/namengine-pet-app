@@ -310,9 +310,11 @@ FALLBACK_NAMES = [
 ]
 
 PET_RESEARCH_GUIDANCE = """Research-informed pet naming guidance:
-- For dogs and call-responsive pets, favor names that work as an attention cue: usually 1-2 syllables, clean stress, crisp consonants such as k, t, p, d, ch, or b, and vowel endings that are easy to call.
+- For dogs and call-responsive pets, favor names that work as an attention cue: usually 1-2 syllables, clean stress, crisp consonants such as k, t, p, d, s, ch, or b, and open vowel endings such as a, o, or ee when the user's taste allows it.
 - For cats, assume recognition matters more than obedience. Prefer distinctive phonetic shape, avoid names that blur into household words or other pet names, and do not overpromise that the cat will come when called.
+- Avoid or downgrade names that sound like common commands, especially sit, stay, no, come, down, heel, leave it, drop it, wait, or off. Names like Kit, Bo, Ray, or Joe may be charming, but they can blur into commands.
 - For all pets, weigh daily callability, nickname potential, household clarity, and emotional fit. A name should feel good when called often, not just look cute on a list.
+- Recognition is learned through positive repetition. Favor names that owners will enjoy saying often, because consistency, praise, play, food, and attention build the response.
 - Human-style names can be a strong fit when the user wants family-member energy. Word, food, nature, mythology, and pop-culture names should still feel usable and personal.
 - Physical notes, quirks, coloring, breed, and personality should influence imagery and tone when supplied.
 - Treat these as ranking signals, not rigid rules. A beautiful exception can still win if it fits the user's taste.
@@ -557,6 +559,49 @@ def pet_type_category(form_data):
     return 'general_pet'
 
 
+COMMAND_SOUND_ALIKES = {
+    'bo': 'no',
+    'joe': 'no',
+    'jo': 'no',
+    'kit': 'sit',
+    'bit': 'sit',
+    'ray': 'stay',
+    'rey': 'stay',
+    'shay': 'stay',
+    'fay': 'stay',
+    'kay': 'stay',
+    'may': 'stay',
+    'mo': 'no',
+    'noe': 'no',
+    'downy': 'down',
+    'dee': 'leave',
+    'lee': 'leave',
+}
+
+
+def command_confusion_penalty(name, form_data):
+    cleaned = re.sub(r'[^a-z]', '', (name or '').lower())
+    if not cleaned:
+        return 0
+
+    penalty = 0
+    if cleaned in COMMAND_SOUND_ALIKES:
+        penalty -= 18
+    elif any(cleaned.endswith(sound) for sound in COMMAND_SOUND_ALIKES if len(sound) > 2):
+        penalty -= 8
+
+    if cleaned in {'come', 'sit', 'stay', 'down', 'heel', 'wait', 'off', 'no'}:
+        penalty -= 24
+    if cleaned.startswith(('no', 'sit', 'stay')) and len(cleaned) <= 6:
+        penalty -= 8
+
+    if pet_type_category(form_data) == 'call_responsive':
+        return penalty
+    if pet_type_category(form_data) == 'recognition_oriented':
+        return round(penalty * 0.5)
+    return round(penalty * 0.75)
+
+
 def callability_score(name, form_data):
     cleaned = re.sub(r'[^a-z]', '', (name or '').lower())
     if not cleaned:
@@ -575,6 +620,7 @@ def callability_score(name, form_data):
         score += 4
     if re.search(r'(.)\1{2,}', cleaned) or re.search(r'[^aeiouy]{4,}', cleaned):
         score -= 8
+    score += command_confusion_penalty(cleaned, form_data)
     if pet_type_category(form_data) == 'call_responsive':
         return score
     if pet_type_category(form_data) == 'recognition_oriented':
