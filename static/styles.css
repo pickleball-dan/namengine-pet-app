@@ -1301,10 +1301,10 @@ textarea { resize: vertical; }
 
 .reaction-pill:hover .reaction-choice,
 .reaction-pill.is-selected .reaction-choice {
-  border-color: rgba(252, 186, 118, 0.72);
-  background: rgba(255, 248, 239, 0.96);
+  border-color: rgba(47, 148, 134, 0.5);
+  background: rgba(255, 255, 255, 0.9);
   color: var(--accent-deep);
-  box-shadow: 0 8px 16px rgba(73, 49, 32, 0.13);
+  box-shadow: 0 8px 16px rgba(27, 35, 54, 0.14);
   transform: translateY(-3px);
 }
 
@@ -1314,9 +1314,9 @@ textarea { resize: vertical; }
 }
 
 .reaction-pill.is-selected .reaction-choice {
-  border-color: rgba(252, 186, 118, 0.95);
+  border-color: rgba(47, 148, 134, 0.78);
   border-width: 2px;
-  box-shadow: 0 0 0 2px rgba(252, 186, 118, 0.24), 0 10px 18px rgba(73, 49, 32, 0.16);
+  box-shadow: 0 0 0 2px rgba(47, 148, 134, 0.14), 0 10px 18px rgba(27, 35, 54, 0.16);
 }
 
 .reaction-pill.is-selected .reaction-choice::after {
@@ -1329,7 +1329,7 @@ textarea { resize: vertical; }
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: var(--accent-pet);
+  background: var(--accent-deep);
   color: #fff;
   font-size: 0.44rem;
   font-weight: 700;
