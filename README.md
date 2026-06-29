@@ -53,6 +53,33 @@ Optional environment variables:
 
 Before enabling production feedback, share the Google Sheet with the service account `client_email` as Editor.
 
+## Smoke tests
+
+The Pet smoke harness writes a CSV backup by default:
+
+```bash
+python run_pet_smoke_test_batch.py
+```
+
+To append the same rows directly to the grading Google Sheet:
+
+```bash
+python run_pet_smoke_test_batch.py --append-to-sheets
+```
+
+To upload existing CSVs:
+
+```bash
+python append_pet_smoke_csv_to_google_sheet.py namengine_pet_smoke_test_YYYYMMDD-HHMMSS.csv
+```
+
+Optional environment variables:
+- `GOOGLE_SMOKE_TEST_SHEET_ID` - spreadsheet ID for smoke-test grading rows
+- `GOOGLE_SMOKE_TEST_WORKSHEET` - worksheet tab name, defaults to `Smoke Tests`
+- `GOOGLE_SERVICE_ACCOUNT_JSON` - full service account JSON as a secret env var
+
+Share the grading Google Sheet with the service account `client_email` as Editor before appending.
+
 ## Feature flags
 
 - `LIVE_BRIEF_ENABLED` - defaults to `true`; set to `false` to hide the live Taste builder on the curated intake without removing the code.
