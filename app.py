@@ -34,6 +34,7 @@ MAX_REFINEMENT_ROUNDS = 2
 SHARE_STORE_PATH = Path(os.getenv('SHARE_STORE_PATH', Path(__file__).with_name('share_store.json')))
 FEEDBACK_STORE_PATH = Path(os.getenv('FEEDBACK_STORE_PATH', Path(__file__).with_name('feedback_store.json')))
 FEEDBACK_RATE_LIMIT = {}
+PLATFORM_HOME_URL = os.getenv('NAMENGINE_HOME_URL', 'https://namengine-app.onrender.com/')
 
 REACTION_OPTIONS = [
     {
@@ -93,6 +94,7 @@ def inject_reaction_labels():
         'cultural_feel_options': CULTURAL_FEEL_OPTIONS,
         'feedback_enabled': feedback_enabled(),
         'live_brief_enabled': live_brief_enabled(),
+        'platform_home_url': PLATFORM_HOME_URL,
     }
 
 ORIGINAL_TUNE_OPTIONS = [
@@ -2427,3 +2429,6 @@ def name_detail(slug):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
+
+
+
