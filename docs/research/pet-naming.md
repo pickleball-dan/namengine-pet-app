@@ -22,11 +22,11 @@ Use these as engine signals, not user-facing copy.
 ## Species-weighted engine use
 
 - Dog: strongest acoustic/callability weighting, with command-sound avoidance treated as important.
-- Cat: recognition and distinctive phonetic shape matter; obedience-style response should be de-emphasized.
+- Cat: recognition and distinctive phonetic shape matter; obedience-style response should be de-emphasized. Mythic/elegant names can work if they remain pet-ownable.
 - Horse: voice clarity matters in barn/outdoor settings, but the emotional tone should skew steady, strong, and dignified.
-- Bird: for parrots and social vocal birds, repeatable, bright, sing-song shapes matter more than formal meaning.
-- Rabbit: use soft positive-association naming; evidence for name cognition is weaker than for dogs/cats.
-- Reptile: lean more on visual/personality symbolism and owner meaning than call-response science.
+- Bird: for parrots and social vocal birds, repeatable, bright, sing-song shapes matter more than formal meaning; avoid heavy mythology unless requested.
+- Rabbit: use soft positive-association naming; mythic/romantic names can work when they stay gentle and simple. Evidence for name cognition is weaker than for dogs/cats.
+- Reptile: lean more on visual/personality symbolism and owner meaning than call-response science. Avoid deity, demon, or religious names unless requested.
 - Other: balance emotional projection with daily usability without overclaiming animal recognition.
 
 ## Sources checked

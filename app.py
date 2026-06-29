@@ -317,7 +317,7 @@ PET_RESEARCH_GUIDANCE = """Research-informed pet naming guidance:
 - Recognition is learned through positive repetition. Favor names that owners will enjoy saying often, because consistency, praise, play, food, and attention build the response.
 - Human-style names can be a strong fit when the user wants family-member energy. Word, food, nature, mythology, and pop-culture names should still feel usable and personal.
 - Physical notes, quirks, coloring, breed, and personality should influence imagery and tone when supplied.
-- Species weighting matters: dogs need the strongest call-name clarity; cats need distinctive recognition without obedience assumptions; horses need barn/outdoor clarity and steady dignity; birds need bright repeatable vocal shape; rabbits need soft positive-association names; reptiles lean more on visual/personality symbolism than response-to-name science.
+- Species weighting matters: dogs need the strongest call-name clarity; cats can carry mythic/elegant names if they still feel pet-ownable; horses need barn/outdoor clarity and steady dignity; birds need bright repeatable vocal shape and should avoid heavy mythic naming unless requested; rabbits can carry soft mythic/romantic names if they stay gentle and simple; reptiles lean more on visual/personality symbolism than response-to-name science and should avoid deity/demon/religious names unless requested.
 - Treat these as ranking signals, not rigid rules. A beautiful exception can still win if it fits the user's taste.
 """
 
@@ -350,6 +350,7 @@ Core standards:
 - Pay attention to callability, pronunciation friction, trend fatigue, pet personality, household fit, and emotional tone.
 - If the taste notes suggest household compromise or mixed tastes, reflect that in the list balance.
 - Use the research guidance below quietly when ranking names. Do not mention research unless it directly helps explain fit.
+- Species guardrails: for cats, mythic/elegant is allowed but avoid over-ornate invented names unless the user asks; for birds, prefer bright repeatable names over mythology; for rabbits, keep soft/romantic names simple and pet-like; for reptiles, prefer visual color, texture, landscape, and personality names over gods, demons, or religious figures.
 
 Decision policy:
 - Treat HARD CONSTRAINTS as non-negotiable.
@@ -390,6 +391,7 @@ Core standards:
 - Names should still feel usable for a real pet in daily life.
 - Use plain ASCII spellings only; do not use accent marks or special characters.
 - Avoid fantasy, product-code, app-name, and random-syllable energy unless the user explicitly asks for boldness.
+- Original pet names should sound like something someone could happily say every day. Avoid fantasy-character endings and app-name shapes unless explicitly requested.
 - Add an emotional_opener that explains the first impression in a short, human phrase.
 - Favor clean spoken shape, good mouthfeel, and social usability.
 - Use name inspiration as a creative cue for rhythm, imagery, and sound, not as a claim of linguistic authenticity.
@@ -580,7 +582,7 @@ SPECIES_PROFILES = {
         'label': 'Cat',
         'callability_weight': 0.6,
         'command_weight': 0.45,
-        'guidance': 'Prioritize distinctive recognition and owner-emotional fit. Avoid implying the cat will reliably come when called.',
+        'guidance': 'Prioritize distinctive recognition and owner-emotional fit. Mythic/elegant names are welcome when they still feel usable for a real cat.',
     },
     'horse': {
         'label': 'Horse',
@@ -592,19 +594,19 @@ SPECIES_PROFILES = {
         'label': 'Bird',
         'callability_weight': 0.75,
         'command_weight': 0.45,
-        'guidance': 'Prioritize bright, repeatable, social vocal shape, especially for parrot-like birds.',
+        'guidance': 'Prioritize bright, repeatable, social vocal shape, especially for parrot-like birds. Keep mythology light unless requested.',
     },
     'rabbit': {
         'label': 'Rabbit',
         'callability_weight': 0.45,
         'command_weight': 0.35,
-        'guidance': 'Prioritize gentle sound, soft association, and owner bond rather than strong obedience-style call response.',
+        'guidance': 'Prioritize gentle sound, soft association, and owner bond. Mythic or romantic names can work if they stay soft and simple.',
     },
     'reptile': {
         'label': 'Reptile',
         'callability_weight': 0.2,
         'command_weight': 0.15,
-        'guidance': 'Prioritize visual/personality symbolism, species feel, and owner meaning more than response-to-name science.',
+        'guidance': 'Prioritize visual/personality symbolism, species feel, and owner meaning. Avoid deity, demon, or religious names unless requested.',
     },
     'general_pet': {
         'label': 'Pet',
@@ -642,6 +644,16 @@ COMMAND_SOUND_ALIKES = {
     'dee': 'leave',
     'lee': 'leave',
 }
+
+
+HEAVY_MYTHIC_OR_RELIGIOUS_NAMES = {
+    'azazel', 'vishnu', 'sekhmet', 'brontes', 'seraphim', 'morrigan',
+    'ignatius', 'aurelius', 'thalassa', 'seraphine', 'calantha',
+}
+
+FANTASY_OR_APP_ORIGINAL_MARKERS = [
+    'ae', 'zy', 'q', 'xan', 'xar', 'lor', 'ian', 'mir', 'vyr', 'thos',
+]
 
 
 def command_confusion_penalty(name, form_data):
@@ -696,6 +708,8 @@ def species_style_score(name, form_data):
             score += 4
         if cleaned.endswith(('a', 'i', 'o', 'ie')):
             score += 3
+        if len(cleaned) > 8:
+            score -= 5
     elif category == 'horse':
         if re.search(r'[bdgkrt]', cleaned):
             score += 4
@@ -708,17 +722,75 @@ def species_style_score(name, form_data):
             score += 4
         if len(cleaned) <= 6:
             score += 2
+        if cleaned in HEAVY_MYTHIC_OR_RELIGIOUS_NAMES:
+            score -= 12
     elif category == 'rabbit':
         if cleaned.endswith(('a', 'ie', 'y', 'i')):
             score += 3
         if re.search(r'[bpml]', cleaned):
             score += 2
+        if len(cleaned) > 8:
+            score -= 5
     elif category == 'reptile':
         if re.search(r'[zksrv]', cleaned):
             score += 4
         if len(cleaned) >= 4:
             score += 2
+        if cleaned in HEAVY_MYTHIC_OR_RELIGIOUS_NAMES:
+            score -= 18
     return score
+
+
+def species_curated_penalty(name, form_data):
+    cleaned = re.sub(r'[^a-z]', '', (name or '').lower())
+    category = pet_type_category(form_data)
+    if not cleaned:
+        return 0
+    penalty = 0
+    if category == 'reptile' and cleaned in HEAVY_MYTHIC_OR_RELIGIOUS_NAMES:
+        penalty -= 24
+    if category == 'bird' and cleaned in HEAVY_MYTHIC_OR_RELIGIOUS_NAMES:
+        penalty -= 14
+    if category in {'cat', 'rabbit'} and len(cleaned) > 9:
+        penalty -= 8
+    return penalty
+
+
+def curated_candidate_score(item, form_data):
+    name = item.get('name', '') if isinstance(item, dict) else str(item)
+    text = ' '.join(str(item.get(key, '')) for key in ['origin', 'style', 'meaning', 'why']).lower() if isinstance(item, dict) else ''
+    category = pet_type_category(form_data)
+    score = callability_score(name, form_data) + species_style_score(name, form_data) + species_curated_penalty(name, form_data)
+
+    if category == 'reptile':
+        if any(token in text for token in ['demon', 'god', 'goddess', 'deity', 'religious']):
+            score -= 18
+        if any(token in text for token in ['color', 'sun', 'fire', 'stone', 'scale', 'desert', 'canyon', 'ember', 'sable']):
+            score += 6
+    elif category == 'bird':
+        if any(token in text for token in ['mythology', 'god', 'goddess']):
+            score -= 10
+        if any(token in text for token in ['music', 'sound', 'song', 'repeat', 'bright']):
+            score += 6
+    elif category == 'rabbit':
+        if any(token in text for token in ['gentle', 'soft', 'sweet', 'forest', 'flower']):
+            score += 5
+        if any(token in text for token in ['tragic', 'war', 'queen', 'goddess']):
+            score -= 8
+    elif category == 'cat':
+        if any(token in text for token in ['mythology', 'moon', 'night', 'star']):
+            score += 4
+        if any(token in text for token in ['added suffix', 'invented', 'derived from']):
+            score -= 7
+    return score
+
+
+def rank_curated_candidates(names, form_data):
+    return sorted(
+        names,
+        key=lambda item: curated_candidate_score(item, form_data),
+        reverse=True,
+    )
 
 
 def summarize_preferences(form_data):
@@ -1302,6 +1374,7 @@ def generate_fallback_results(exclude_names=None, form_data=None):
     candidates = sorted(
         candidates,
         key=lambda item: (
+            curated_candidate_score(item, form_data),
             callability_score(item.get('name'), form_data),
             species_style_score(item.get('name'), form_data),
             random.random(),
@@ -1355,7 +1428,7 @@ def generate_names(form_data, refinement_note='', exclude_names=None):
         payload = json.loads(raw_text) if raw_text else {}
         names = payload.get('names', []) if isinstance(payload, dict) else []
         if names:
-            return names, False
+            return rank_curated_candidates(names, form_data), False
         app.logger.warning('OpenAI response parsed but returned no names payload. Raw text: %s', raw_text)
     except Exception as exc:
         app.logger.exception('OpenAI generation failed: %s', exc)
@@ -1830,6 +1903,8 @@ def is_bad_original_candidate(name, known_names, previous_names):
         return True
     if any(token in lowered for token in ['xq', 'qz', 'zx', 'drug', 'tech', 'app']):
         return True
+    if any(marker in lowered for marker in ['zyph', 'meloq', 'trilix']):
+        return True
     if has_awkward_original_shape(name):
         return True
     return False
@@ -1849,6 +1924,10 @@ def score_original_candidate(name, form_data, known_names):
     score += species_style_score(lowered, form_data)
     if any(slug_similarity(lowered, known) > 0.78 for known in known_names):
         score -= 8
+    if any(marker in lowered for marker in FANTASY_OR_APP_ORIGINAL_MARKERS):
+        score -= 14
+    if lowered.endswith(('lor', 'lix', 'ian', 'q')):
+        score -= 12
     avoid = (form_data.get('avoid_feel') or '').lower()
     if 'trendy' in avoid and any(token in lowered for token in ['lyn', 'leigh', 'den', 'son', 'xton']):
         score -= 18
