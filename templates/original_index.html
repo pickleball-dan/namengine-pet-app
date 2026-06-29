@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+  {% include '_platform_nav.html' %}
   <main class="shell home-shell">
     <section class="hero-card original-hero-card original-hero-wide-title">
       <div>
@@ -18,7 +19,6 @@
           <a class="feedback-mini-link" href="{{ url_for('feedback') }}">Give beta feedback</a>
         </div>
         {% endif %}
-        <a class="platform-home-link" href="{{ platform_home_url }}">NamEngine+</a>
         <img class="logo-lockup" src="{{ url_for('static', filename='images/namengine-pet-logo.png') }}" alt="NamEngine Pet logo">
         <p class="eyebrow">Original Pet Name Studio</p>
         <h1>Create a pet name that feels like it could only come from your life.</h1>
@@ -244,4 +244,5 @@
   </script>
 </body>
 </html>
+
 
