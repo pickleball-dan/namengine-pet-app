@@ -123,6 +123,20 @@
           </label>
 
           <label>
+            <span>Gender</span>
+            <div class="select-wrap tinted-select tinted-peach">
+              <select name="pet_gender">
+                <option value="" {% if not form_data.pet_gender %}selected{% endif %}>Choose</option>
+                <option {% if form_data.pet_gender == 'Male' %}selected{% endif %}>Male</option>
+                <option {% if form_data.pet_gender == 'Female' %}selected{% endif %}>Female</option>
+                <option {% if form_data.pet_gender == 'Neutral' %}selected{% endif %}>Neutral</option>
+              </select>
+            </div>
+          </label>
+        </div>
+
+        <div class="grid two-up">
+          <label>
             <span>What personality should the name capture?</span>
             <div class="select-wrap tinted-select tinted-sky">
               <select name="vibe">
@@ -142,9 +156,7 @@
               </select>
             </div>
           </label>
-        </div>
 
-        <div class="grid two-up">
           <label>
             <span>How familiar should it feel?</span>
             <div class="select-wrap tinted-select tinted-rose">

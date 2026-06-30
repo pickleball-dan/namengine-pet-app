@@ -409,6 +409,7 @@ Here is the structured original-name taste:
 DEFAULT_FORM_DATA = {
     'discovery_style': '',
     'pet_type': '',
+    'pet_gender': '',
     'style': '',
     'vibe': '',
     'cultural_context': '',
@@ -422,6 +423,7 @@ DEFAULT_FORM_DATA = {
 ORIGINAL_FORM_DATA = {
     'discovery_style': '',
     'pet_type': '',
+    'pet_gender': '',
     'style': '',
     'vibe': '',
     'familiarity_preference': '',
@@ -436,6 +438,7 @@ ORIGINAL_FORM_DATA = {
 QUESTION_LABELS = {
     'discovery_style': 'Discovery style',
     'pet_type': 'Pet type',
+    'pet_gender': 'Gender',
     'style': 'Style leaning',
     'vibe': 'Personality',
     'cultural_context': 'Name inspiration',
@@ -497,6 +500,8 @@ def build_details(form_data, refinement_note=''):
 
     if form_data.get('pet_type'):
         hard_constraints.append(f"Pet type: {form_data['pet_type']}")
+    if form_data.get('pet_gender'):
+        hard_constraints.append(f"Pet gender: {form_data['pet_gender']}")
     if form_data.get('pronunciation_importance'):
         hard_constraints.append(f"Easy-to-call requirement: {form_data['pronunciation_importance']}")
 
@@ -801,6 +806,8 @@ def summarize_preferences(form_data):
         parts.append(form_data['discovery_style'])
     if form_data.get('pet_type'):
         parts.append(form_data['pet_type'])
+    if form_data.get('pet_gender'):
+        parts.append(form_data['pet_gender'])
     if form_data.get('style'):
         parts.append(form_data['style'])
     if form_data.get('vibe'):
@@ -1591,7 +1598,7 @@ def get_share_payload_or_404(share_id):
 
 def summarize_original_preferences(form_data, tune_direction=''):
     parts = []
-    for key in ['discovery_style', 'pet_type', 'style', 'vibe', 'cultural_context', 'starting_letter', 'length_preference']:
+    for key in ['discovery_style', 'pet_type', 'pet_gender', 'style', 'vibe', 'cultural_context', 'starting_letter', 'length_preference']:
         value = form_data.get(key)
         if value:
             parts.append(value)
@@ -1637,6 +1644,7 @@ def build_original_details(form_data, tune_direction='', previous_names=None, re
     sections = [
         ('CORE DIRECTION', [
             f"Pet type: {form_data.get('pet_type') or 'Open'}",
+            f"Pet gender: {form_data.get('pet_gender') or 'Open'}",
             f"Discovery style: {format_original_discovery_style(form_data.get('discovery_style'))}",
             f"Current tuning request: {tune_label or 'First pass'}",
         ]),
