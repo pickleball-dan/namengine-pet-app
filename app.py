@@ -6,7 +6,7 @@ import secrets
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlencode
-from flask import Flask, abort, render_template, request, url_for
+from flask import Flask, abort, redirect, render_template, request, url_for
 from markupsafe import Markup
 
 try:
@@ -1517,7 +1517,7 @@ def serialize_form_data(form_data):
 
 
 def serialize_names(names):
-    keys = ['name', 'pronunciation', 'origin', 'style', 'meaning', 'emotional_opener', 'why', 'slug', 'rank_label', 'standout', 'fit_note', 'pairing_note', 'why_detail']
+    keys = ['name', 'pronunciation', 'origin', 'style', 'meaning', 'emotional_opener', 'why', 'slug', 'rank_label', 'standout', 'highlight', 'fit_note', 'pairing_note', 'why_detail', 'structure', 'originality_note']
     return [{key: item.get(key) for key in keys} for item in names]
 
 
@@ -1566,6 +1566,24 @@ def build_original_share_message(payload):
     return f"Here are the original pet names NamEngine Pet created for me — {top_names}. Curious what you think."
 
 
+def build_chosen_share_message(payload):
+    name = payload.get('name', {}).get('name', 'this name')
+    return f"I chose {name} with NamEngine Pet. Curious what you think."
+
+
+def build_chosen_share_meta(payload):
+    name = payload.get('name', {}).get('name', 'A chosen pet name')
+    image_url = absolute_url(url_for('static', filename='images/namengine-pet-card-share-v3.jpg'))
+    return {
+        'meta_title': f"I chose {name} | NamEngine Pet",
+        'meta_description': f"A chosen pet name from NamEngine Pet: {name}.",
+        'meta_image': image_url,
+        'meta_image_width': 1200,
+        'meta_image_height': 630,
+        'meta_image_type': 'image/jpeg',
+    }
+
+
 def create_share_snapshot(shortlist):
     share_store = load_share_store()
     share_id = secrets.token_urlsafe(8)
@@ -1604,6 +1622,37 @@ def create_original_share_snapshot(payload):
     }
     save_share_store(share_store)
     return share_id
+
+
+def create_chosen_name_snapshot(source_share_id, slug):
+    share_store = load_share_store()
+    source_payload = share_store.get(source_share_id)
+    if not source_payload:
+        abort(404)
+
+    selected = next((item for item in source_payload.get('names', []) if item.get('slug') == slug), None)
+    if not selected:
+        abort(404)
+
+    source_mode = source_payload.get('mode', 'shortlist')
+    source_label = 'Original Pet Name Studio' if source_mode == 'original' else source_payload.get('round_label', 'Pet name list')
+    chosen_id = secrets.token_urlsafe(8)
+    payload = {
+        'mode': 'chosen',
+        'source_mode': source_mode,
+        'source_label': source_label,
+        'source_share_id': source_share_id,
+        'name': selected,
+        'form_data': dict(source_payload.get('form_data', {})),
+        'preference_summary': source_payload.get('preference_summary') or source_payload.get('original_summary') or 'Chosen pet name',
+        'editor_note': source_payload.get('editor_note') or source_payload.get('editorial_note') or '',
+        'powered_by': 'Powered by NamEngine Pet',
+        'created_at': datetime.now(timezone.utc).isoformat(),
+    }
+    payload['shared_message'] = build_chosen_share_message(payload)
+    share_store[chosen_id] = payload
+    save_share_store(share_store)
+    return chosen_id
 
 
 def get_share_payload_or_404(share_id):
@@ -2388,6 +2437,30 @@ def shared_shortlist(share_id):
     return render_template('shared_shortlist.html', **payload)
 
 
+@app.route('/choose', methods=['POST'])
+def choose_name():
+    source_share_id = request.form.get('share_id', '').strip()
+    slug = request.form.get('slug', '').strip()
+    if not source_share_id or not slug:
+        abort(400)
+    chosen_id = create_chosen_name_snapshot(source_share_id, slug)
+    return redirect(url_for('chosen_name', chosen_id=chosen_id))
+
+
+@app.route('/chosen/<chosen_id>', methods=['GET'])
+def chosen_name(chosen_id):
+    payload = dict(get_share_payload_or_404(chosen_id))
+    if payload.get('mode') != 'chosen':
+        abort(404)
+    payload['chosen_id'] = chosen_id
+    payload['share_url'] = request.url
+    payload['share_message'] = payload.get('shared_message', build_chosen_share_message(payload))
+    payload['source_link'] = url_for('shared_shortlist', share_id=payload['source_share_id']) if payload.get('source_share_id') else url_for('home')
+    payload['start_over_link'] = '/#brief'
+    payload.update(build_chosen_share_meta(payload))
+    return render_template('chosen_name.html', **payload)
+
+
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     if not feedback_enabled():
@@ -2449,6 +2522,7 @@ def name_detail(slug):
         start_over_link=shortlist.get('start_over_link', '/#brief'),
         used_fallback=shortlist['used_fallback'],
         shortlist_id=shortlist_id,
+        share_id=shortlist.get('share_id', ''),
         round_label=shortlist.get('round_label', make_round_label(1)),
     )
 
