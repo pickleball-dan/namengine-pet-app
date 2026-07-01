@@ -1253,11 +1253,11 @@ textarea { resize: vertical; }
 
 .reaction-options {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 4px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
   align-items: center;
   width: 100%;
-  max-width: 330px;
+  max-width: 360px;
 }
 
 .reaction-pill {
@@ -2149,6 +2149,15 @@ textarea { resize: vertical; }
   .focus-card-grid .why {
     font-size: 1.08rem;
     line-height: 1.42;
+  }
+
+  .focus-card-grid .why-label {
+    display: block;
+    margin: 4px 0 0;
+    color: var(--ink);
+    font-size: 1.18rem;
+    font-weight: 800;
+    text-align: center;
   }
 
   .focus-card-grid .reaction-block {
