@@ -21,7 +21,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}?v=20260701a">
 </head>
 <body>
   {% include '_platform_nav.html' %}
@@ -118,6 +118,7 @@
             <p><strong>Feel</strong><span>{{ item.style }}</span></p>
             <p><strong>Structure</strong><span>{{ item.structure }}</span></p>
           </div>
+          <p class="why-label">Why this name?</p>
           <p class="why">{{ item.why }}</p>
           {% if can_react %}
           <div class="reaction-block">

@@ -1238,6 +1238,13 @@ textarea { resize: vertical; }
   color: var(--ink);
 }
 
+.why-label {
+  display: block;
+  margin: 8px 0 0;
+  color: var(--ink);
+  font-weight: 800;
+}
+
 .focus-card-grid .reaction-label,
 .mobile-focus-meta,
 .mobile-focus-dock {
